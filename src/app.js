@@ -5,8 +5,14 @@ const app = express() ;
 // app.use("/user" , (req , res ) => {
 //     res.send("this will be used for all types of http api call ");
 // })
+app.get("/user" , (req , res) => {
+    console.log(req.query);
+    res.send({Name : "Atul " ,  Age : 19});
+});
 
-app.get("/user" , (req , res) => {x
+
+app.get("/user/:userid" , (req , res) => {
+    console.log(req.params);
     res.send({Name : "Atul " ,  Age : 19});
 });
 
