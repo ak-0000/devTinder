@@ -5,17 +5,65 @@ const { connectdb } = require("./config/database");
 
 const User = require("./models/user");
 
+// to take the dynamic data from the user/postman
+// we use the express.json() middleware
+app.use(express.json());   // this works for all the routes , all of then , it just convert the json data given by the user in postman to js obj .
 app.post("/signup", async (req, res) => {
-  const userdata = {
-    firstName: "tony",
-    lastName: "stark",
-    emailId: "avengerhubro@gmail.com",
-    password: 7,
-  };
-  // adding the user data in a instance of user model
-  const adduser = new User(userdata);
-  await adduser.save();  //data is saved to our database 
-  res.send("user is added to the db");
+  // console.log(req.body);
+  const adduser = new User(req.body);
+  await adduser.save();
+  // const userdata = {
+  //   firstName: "tony",
+  //   lastName: "stark",
+  //   emailId: "avengerhubro@gmail.com",
+  //   password: 7,
+  // };
+  // // adding the user data in a instance of user model
+  // const adduser = new User(userdata);
+  // await adduser.save(); //data is saved to our database
+  // res.send("user is added to the db");
+});
+
+app.get("/user", async (req, res) => {
+  const userEmail = req.body.emailId;
+  // console.log(userEmail);
+  try {
+    const getuser = await User.find({ emailId: userEmail });
+    console.log(getuser);
+  } catch (err) {
+    req.status(404).send("Something went wrong");
+  }
+});
+
+app.get("/feed", async (req, res) => {
+  try {
+    const feeddata = await User.find({});
+    console.log(feeddata);
+  } catch (err) {
+    req.status(404).send("Something went Crazy");
+  }
+});
+
+app.delete("/user" , async(req , res) => {
+  const useremailId = req.body.emailId ;
+  try {
+    const deleteduser =  await User.deleteOne({emailId : useremailId});
+    res.send("user has been deleted from the db");
+  } catch (err) {
+    req.status(404).send("Something went wrong");
+  }
+});
+
+app.patch("/user" , async(req,res) => {
+  const userid = req.body.userid;
+  try {
+    const updateuser =  await User.findByIdAndUpdate(userid , {lastName : "The Great Superstar"});
+    // const updateuser =  await User.updateOne({_id : userid} , {lastName : "The Great Superdstar"});
+    
+    res.send("user has been updated on the db");
+  } catch (err) {
+    req.status(404).send("Something went wrong");
+  }
 });
 
 connectdb().then(() => {

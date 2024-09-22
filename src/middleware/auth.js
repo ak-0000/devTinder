@@ -9,7 +9,6 @@ const authadmin = (req , res , next) => {
         next();
     }
 }
-
 const authuser = (req , res , next) => {
     console.log("checking the auth");
     const token = "secret";
@@ -21,8 +20,6 @@ const authuser = (req , res , next) => {
         next();
     }
 }
-
-
 
 module.exports = {
     authadmin,
