@@ -1,27 +1,36 @@
 const express = require("express");
 const app = express();
-
-const { connectdb } = require("./config/database");
-
 const User = require("./models/user");
+const { connectdb } = require("./config/database");
+const bcrypt = require("bcrypt");
+const { validateSignUpData } = require("./utils/validateSignUpData");
+
+
 
 // to take the dynamic data from the user/postman
 // we use the express.json() middleware
 app.use(express.json()); // this works for all the routes , all of then , it just convert the json data given by the user in postman to js obj .
-app.post("/signup", async (req, res) => {
-  // console.log(req.body);
-  const adduser = new User(req.body);
-  await adduser.save();
-  // const userdata = {
-  //   firstName: "tony",
-  //   lastName: "stark",
-  //   emailId: "avengerhubro@gmail.com",
-  //   password: 7,
-  // };
-  // // adding the user data in a instance of user model
-  // const adduser = new User(userdata);
-  // await adduser.save(); //data is saved to our database
-  // res.send("user is added to the db");
+app.post("/signup", async (req, res) => { 
+  try{
+    // validate the data 
+    validateSignUpData(req);
+    //  encrpyt the password  -> bcrypt
+    const {firstName , lastName , emailId , password} = req.body ;
+    const encrptpassword = await bcrypt.hash(password , 10);
+    
+    // const adduser = new User(req.body);   // this is also right but as we know we cannot trust the req.body 
+    const adduser = new User({
+      firstName , 
+      lastName , 
+      emailId ,
+      password : encrptpassword ,
+    });
+    await adduser.save();
+    res.send("user has signedup to database")
+  }
+  catch(err){
+    res.send("ERROR :" + err.message);
+  }
 });
 
 app.get("/user", async (req, res) => {
