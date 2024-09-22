@@ -7,7 +7,7 @@ const User = require("./models/user");
 
 // to take the dynamic data from the user/postman
 // we use the express.json() middleware
-app.use(express.json());   // this works for all the routes , all of then , it just convert the json data given by the user in postman to js obj .
+app.use(express.json()); // this works for all the routes , all of then , it just convert the json data given by the user in postman to js obj .
 app.post("/signup", async (req, res) => {
   // console.log(req.body);
   const adduser = new User(req.body);
@@ -44,25 +44,41 @@ app.get("/feed", async (req, res) => {
   }
 });
 
-app.delete("/user" , async(req , res) => {
-  const useremailId = req.body.emailId ;
+app.delete("/user", async (req, res) => {
+  const useremailId = req.body.emailId;
   try {
-    const deleteduser =  await User.deleteOne({emailId : useremailId});
+    const deleteduser = await User.deleteOne({ emailId: useremailId });
     res.send("user has been deleted from the db");
   } catch (err) {
     req.status(404).send("Something went wrong");
   }
 });
 
-app.patch("/user" , async(req,res) => {
-  const userid = req.body.userid;
+app.patch("/user/:userId", async (req, res) => {
+  const userid = req.params?.userId ;
+  const data = req.body;
   try {
-    const updateuser =  await User.findByIdAndUpdate(userid , {lastName : "The Great Superstar"});
+    if(data.skills.length > 10 ){
+      throw new Error("skills can't be more than 10 ")
+    }
+    //writing logic to have data more secure  
+    const ALLOWED_UPDATES = ["userid", "firstName", "about", "skills"];
+    const isAllowedUpdate = Object.keys(data).every((k) =>
+      ALLOWED_UPDATES.includes(k)
+    );
+    if (!isAllowedUpdate) {
+      throw new Error("Update is not allowed");
+    }
+    const updateuser = await User.findByIdAndUpdate(userid, data, {
+      new : true,
+      runValidators: true,
+    });
     // const updateuser =  await User.updateOne({_id : userid} , {lastName : "The Great Superdstar"});
-    
+    // to use the rules of schema in already putted data when update
+
     res.send("user has been updated on the db");
   } catch (err) {
-    req.status(404).send("Something went wrong");
+    res.status(404).send(err.message);
   }
 });
 
