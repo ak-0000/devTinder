@@ -1,6 +1,8 @@
 // create a user schema
 const validator = require("validator");
 const { mongoose } = require("mongoose");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const userSchema = new mongoose.Schema(
   {
@@ -65,5 +67,23 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+userSchema.methods.getjwt = async function () {
+  const user = this;
+  const token = await jwt.sign({ id: user._id }, "Dev@tinder123", {
+    expiresIn: "7d",
+  });
+};
+
+userSchema.methods.validatePassword = async function (passwordInputByUser) {
+  const user = this;
+  const passwordhash = user.password;
+
+  const isPasswordValid = await bcrypt.compare(
+    passwordInputByUser,
+    passwordhash
+  );
+  return isPasswordValid;
+};
 
 module.exports = mongoose.model("User", userSchema);
