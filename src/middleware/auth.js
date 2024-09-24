@@ -1,27 +1,26 @@
-const authadmin = (req , res , next) => {
-    console.log("checking the auth");
-    const token = "zxc";
-    const checkingtoken = token === "secret";
-    if(!checkingtoken){
-        res.status(401).send("you are not a admin ");
+const jwt = require("jsonwebtoken");
+const User = require("../models/user")
+
+
+const userAuth = async (req, res, next) => {
+  try {
+    const { token } = req.cookies;
+    if (!token) {
+      throw new Error("token is invalid");
     }
-    else{
-        next();
+    const decodeobj = await jwt.verify(token, "Dev@tinder123" ); // returs the secret data in the token
+    const { _id } = decodeobj;
+    const user = await User.findById(_id);
+    if (!user) {
+      throw new Error("user not found");
     }
-}
-const authuser = (req , res , next) => {
-    console.log("checking the auth");
-    const token = "secret";
-    const checkingtoken = token === "secret";
-    if(!checkingtoken){
-        res.status(401).send("you are not a user ");
-    }
-    else{
-        next();
-    }
-}
+    req.user = user ;                // attaching user to req.user so that we can use this in other apis
+    next();
+  } catch (err) {
+    res.send("ERROR : " + err.message);
+  }
+};
 
 module.exports = {
-    authadmin,
-    authuser,
-}
+  userAuth,
+};
