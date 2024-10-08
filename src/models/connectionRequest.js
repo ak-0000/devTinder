@@ -4,6 +4,7 @@ const connectionRequestSchema = new mongoose.Schema(
   {
     fromUserId: {
       type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required : true ,
     },
     toUserId: {
@@ -14,7 +15,7 @@ const connectionRequestSchema = new mongoose.Schema(
       type: String,
       enum: {
         values: ["interested", "ignored", "accepted", "rejected"],
-        message: `{VALUE} is not accepted `,
+        message: `{VALUE} is not accepted`,
       },
       required : true ,
     },
@@ -38,6 +39,6 @@ connectionRequestSchema.pre("save" , function (next) {
 
 
 
-const ConnectionRequest = new mongoose.model("connectionRequset " , connectionRequestSchema);
+const ConnectionRequest = new mongoose.model("connectionRequest " , connectionRequestSchema);
 
 module.exports = ConnectionRequest ;
