@@ -1,12 +1,8 @@
 // auth path apis
-
 const express = require("express");
-
 const authRouter = express.Router();
-
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
-
 const { validateSignUpData } = require("../utils/validateSignUpData");
 
 authRouter.post("/signup", async (req, res) => {
@@ -59,7 +55,7 @@ authRouter.post("/login", async (req, res) => {
 authRouter.post("/logout" , async(req, res) => {
   res.cookie("token" , null , {expiresIn: new Date(Date.now())});
   res.send("logout is successfull");
-}); 
+});
 
 
 module.exports = authRouter;

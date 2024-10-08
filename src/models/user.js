@@ -68,12 +68,14 @@ const userSchema = new mongoose.Schema(
   }
 );
 
+userSchema.index({firstName : 1 , lastName : 1 });
+
 userSchema.methods.getjwt = async function () {
   const user = this;
   const token = await jwt.sign({ _id: user._id }, "Dev@tinder123", {
     expiresIn: "7d",
   });
-  return token ;
+  return token;
 };
 
 userSchema.methods.validatePassword = async function (passwordInputByUser) {
@@ -84,7 +86,7 @@ userSchema.methods.validatePassword = async function (passwordInputByUser) {
     passwordInputByUser,
     passwordhash
   );
-  
+
   return isPasswordValid;
 };
 

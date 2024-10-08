@@ -19,10 +19,19 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
     const loggedInUser = req.user;
     Object.keys(req.body).forEach((key) => (loggedInUser[key] = req.body[key]));
     loggedInUser.save();
+    res.json({
+      message: `${loggedInUser.firstName}, your profile is updated`,
+      data: loggedInUser,
+    });
     res.send("Updates are done");
   } catch (err) {
     res.send("ERROR : " + err.message);
   }
 });
+
+profileRouter.patch("/profile/password", userAuth, (req, res) => {
+  // to be done next time 
+});
+
 
 module.exports = profileRouter;
