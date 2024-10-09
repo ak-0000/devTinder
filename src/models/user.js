@@ -40,6 +40,7 @@ const userSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
+      required : true , 
       validate(value) {
         // only run when new user is created
         if (!["male", "female ", "others"].includes(value)) {
